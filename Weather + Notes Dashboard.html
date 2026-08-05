@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weather + Notes Dashboard</title>
+<style>
+  body{margin:0;font-family:Arial,sans-serif;background:#f9fafc;color:#333}
+  header{background:#0b74de;color:#fff;padding:1.5rem;text-align:center}
+  h1{margin:0}
+  main{max-width:1000px;margin:2rem auto;padding:1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+  .card{background:#fff;padding:1rem;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+  h2{margin-top:0;color:#0ea5a4}
+  .weather-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .weather-card{background:#f0f4f9;padding:.8rem;border-radius:8px;text-align:center}
+  .city{font-weight:bold;color:#0b74de}
+  .temp{font-size:1.5rem;color:#0ea5a4}
+  .condition{color:#555}
+  ul{list-style:none;padding:0;margin:.5rem 0}
+  li{padding:.4rem;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+  input,textarea{width:100%;padding:.6rem;margin:.4rem 0;border:1px solid #ccc;border-radius:6px}
+  button{padding:.5rem .9rem;background:#0b74de;color:#fff;border:none;border-radius:6px;cursor:pointer}
+  .delete{background:#ef4444}
+</style>
+</head>
+<body>
+<header>
+  <h1>Weather + Notes Dashboard</h1>
+</header>
+
+<main>
+  <!-- Weather -->
+  <div class="card">
+    <h2>Weather</h2>
+    <div class="weather-grid" id="weatherGrid"></div>
+  </div>
+
+  <!-- Notes -->
+  <div class="card">
+    <h2>Notes</h2>
+    <textarea id="noteInput" rows="3" placeholder="Write a note..."></textarea>
+    <button onclick="addNote()">Add Note</button>
+    <ul id="noteList"></ul>
+  </div>
+</main>
+
+<script>
+  // Weather mock data
+  const weatherData=[
+    {city:"Hyderabad",temp:30,condition:"Sunny"},
+    {city:"Delhi",temp:35,condition:"Hot"},
+    {city:"Mumbai",temp:28,condition:"Humid"},
+    {city:"Bangalore",temp:25,condition:"Cloudy"}
+  ];
+  const weatherGrid=document.getElementById('weatherGrid');
+  weatherData.forEach(d=>{
+    const card=document.createElement('div');
+    card.className='weather-card';
+    card.innerHTML=`
+      <div class="city">${d.city}</div>
+      <div class="temp">${d.temp}°C</div>
+      <div class="condition">${d.condition}</div>
+    `;
+    weatherGrid.appendChild(card);
+  });
+
+  // Notes
+  let notes=JSON.parse(localStorage.getItem('notes')||'[]');
+  const noteList=document.getElementById('noteList');
+  function renderNotes(){
+    noteList.innerHTML='';
+    notes.forEach((n,i)=>{
+      const li=document.createElement('li');
+      li.textContent=n;
+      const del=document.createElement('button');
+      del.textContent='✕';
+      del.className='delete';
+      del.onclick=()=>{notes.splice(i,1);saveNotes();};
+      li.appendChild(del);
+      noteList.appendChild(li);
+    });
+  }
+  function addNote(){
+    const val=document.getElementById('noteInput').value.trim();
+    if(val){notes.push(val);document.getElementById('noteInput').value='';saveNotes();}
+  }
+  function saveNotes(){localStorage.setItem('notes',JSON.stringify(notes));renderNotes();}
+  renderNotes();
+</script>
+</body>
+</html>
